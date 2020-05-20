@@ -21,7 +21,7 @@ This program works better if you name your profile bindings in iCUE.
 The order the keybindings are shown is determined by the order in iCUE
 
 # Gif
-
+![Example Gif](/Example.gif)
 
 ## TODO
   * Code Clean up
