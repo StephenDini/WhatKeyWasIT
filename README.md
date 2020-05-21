@@ -14,6 +14,7 @@ PyQt5 and pyqtkeybind
 * Hover over the buttons to view the shortcut string.
 * Click the windows background to hide the window (similar to Ctrl+Shift+F10)
 * Click the drop down box to select a profile.
+* Arrow Up and Down can also be used to change profiles.
 
 # Notes
 This program works better if you name your profile bindings in iCUE.
