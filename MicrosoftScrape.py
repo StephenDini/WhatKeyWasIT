@@ -23,12 +23,15 @@ def getListofChanges():
     with open(path.expandvars(r'%LOCALAPPDATA%\Microsoft\PowerToys\Keyboard Manager\default.json')) as f:
         microsoft_keybind_file = json.load(f)
 
+    with open(path.expandvars(r'%LOCALAPPDATA%\Microsoft\PowerToys\settings.json')) as f:
+        m_enabled_check = json.load(f)
+
     remapKeys = microsoft_keybind_file["remapKeys"]
     inProcess = remapKeys["inProcess"]
+    enable_check = m_enabled_check["enabled"]
+    key_manager = enable_check["Keyboard Manager"]
+    print(key_manager)
 
-    return [(str(devirtualize(container['originalKeys'])),  str(devirtualize(container['newRemapKeys']))) for container in inProcess]
-
-
-print(devirtualize('111'))
-
-
+    gathered_binds = [(str(devirtualize(container['originalKeys'])),  str(devirtualize(container['newRemapKeys']))) for container in inProcess]
+    gathered_binds.append(key_manager)
+    return gathered_binds

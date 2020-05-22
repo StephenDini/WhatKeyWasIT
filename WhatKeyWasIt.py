@@ -81,9 +81,9 @@ class ImportProfile(profilePathList):
                         if keyBound.find('first') is not None:
                             if strokeContainer is None:
                                 strokeContainer = keyBound.find('first').text
-                                print(strokeContainer)
+                                # print(strokeContainer)
                                 strokeContainer = strokeContainer + ', ' + keyBound.find('second').text
-                                print(strokeContainer)
+                                # print(strokeContainer)
                             else:
                                 strokeContainer = strokeContainer + ', ' + keyBound.find('first').text
                                 strokeContainer = strokeContainer + ', ' + keyBound.find('second').text
@@ -132,10 +132,6 @@ class MainWindow(QMainWindow):
                                    border: black solid 1px
                                    }""")
 
-        profileList = listifyFolderFiles(os.path.expandvars(r'%APPDATA%\Corsair\CUE\profiles'))
-        DATA = ImportProfile()
-
-        shortcutsParsed = DATA.scrapeall(profileList)
         pagehold = 0
         buttonList = list()
         global pageHolder
@@ -143,97 +139,116 @@ class MainWindow(QMainWindow):
         maxHeightReached = 0
         maxWidthReached = 0
 
-        for page in shortcutsParsed:
-            section = 1
-            shortcutCounter = 0
+        try:
+            profileList = listifyFolderFiles(os.path.expandvars(r'%APPDATA%\Corsair\CUE\profiles'))
+            DATA = ImportProfile()
+
+            shortcutsParsed = DATA.scrapeall(profileList)
+
+            for page in shortcutsParsed:
+                section = 1
+                shortcutCounter = 0
+                x = 20
+                y = 20
+                profileName = page.pop(-1)
+                nameHolder.append(profileName.text)
+
+                for part in page:
+
+                    if section == 1:
+                        shortcutName, shortcutKeys = part.split(",", 1)
+                        section = 2
+                    else:
+                        boundKey, modifier = part.split(",", 1)
+                        section = 1
+
+                    if section == 1:
+                        if shortcutCounter == 9:
+                            x = x + 155
+                            if maxWidthReached < x:
+                                maxWidthReached = x
+                            y = 20
+                            shortcutCounter = 0
+
+                        labelNew = QPushButton(boundKey + ": " + shortcutName, self)
+                        labelNew.setToolTip("The Key(s) are: " + shortcutKeys + ". Modifier: " + modifier)
+                        labelNew.resize(150, 30)
+
+                        if shortcutCounter == 0:
+                            labelNew.move(x, y)
+                        else:
+                            y = y + 35
+                            if maxHeightReached < y:
+                                maxHeightReached = y
+
+                            labelNew.move(x, y)
+
+                        shortcutCounter += 1
+                        # labelNew.hide()
+                        buttonList.append(labelNew)
+                        section = 1
+
+                pageHolder.update({pagehold: buttonList.copy()})
+                pagehold += 1
+                buttonList.clear()
+        except FileNotFoundError:
+            print('Skipping corsair since its not in use')
+
+
+        try:
+            # Bring in Microsoft's Keyboard Manager settings.
             x = 20
             y = 20
-            profileName = page.pop(-1)
-            nameHolder.append(profileName.text)
+            m_section = 0
+            m_counter = 0
+            microsoft_keybindings = MicrosoftScrape.getListofChanges()
+            microsoft_enable_check = microsoft_keybindings.pop()
+            microsoft_label = [QPushButton(bind[0], self) for bind in microsoft_keybindings]
+            microsoft_tooltip = [bind[1] for bind in microsoft_keybindings]
 
-            for part in page:
-
-                if section == 1:
-                    shortcutName, shortcutKeys = part.split(",", 1)
-                    section = 2
+            for label in microsoft_label:
+                if m_section == 9:
+                    x = x + 175
+                    y = 20
+                    if maxWidthReached < x:
+                        maxWidthReached = x
+                    m_section = 0
+                if m_section == 0:
+                    label.move(x, y)
+                    label.resize(150, 30)
+                    label.setToolTip(microsoft_tooltip[m_counter])
                 else:
-                    boundKey, modifier = part.split(",", 1)
-                    section = 1
+                    y = y + 35
+                    if maxHeightReached < y:
+                        maxHeightReached = y
+                    label.move(x, y)
+                    label.resize(150, 30)
+                    label.setToolTip(microsoft_tooltip[m_counter])
+                m_section += 1
+                m_counter += 1
 
-                if section == 1:
-                    if shortcutCounter == 9:
-                        x = x + 155
-                        if maxWidthReached < x:
-                            maxWidthReached = x
-                        y = 20
-                        shortcutCounter = 0
-
-                    labelNew = QPushButton(boundKey + ": " + shortcutName, self)
-                    labelNew.setToolTip("The Key(s) are: " + shortcutKeys + ". Modifier: " + modifier)
-                    labelNew.resize(150, 30)
-
-                    if shortcutCounter == 0:
-                        labelNew.move(x, y)
-                    else:
-                        y = y + 35
-                        if maxHeightReached < y:
-                            maxHeightReached = y
-
-                        labelNew.move(x, y)
-
-                    shortcutCounter += 1
-                    # labelNew.hide()
-                    buttonList.append(labelNew)
-                    section = 1
-
-            pageHolder.update({pagehold: buttonList.copy()})
-            pagehold += 1
-            buttonList.clear()
-
-        x = 20
-        y = 20
-        m_section = 0
-        m_counter = 0
-        microsoft_keybindings = MicrosoftScrape.getListofChanges()
-        microsoft_label = [QPushButton(bind[0], self) for bind in microsoft_keybindings]
-        microsoft_tooltip = [bind[1] for bind in microsoft_keybindings]
-
-        for label in microsoft_label:
-            if m_section == 9:
-                x = x + 175
-                y = 20
-                if maxWidthReached < x:
-                    maxWidthReached = x
-                m_section = 0
-            if m_section == 0:
-                label.move(x, y)
-                label.resize(150, 30)
-                label.setToolTip(microsoft_tooltip[m_counter])
-            else:
-                y = y + 35
-                label.move(x, y)
-                label.resize(150, 30)
-                label.setToolTip(microsoft_tooltip[m_counter])
-            m_section += 1
-            m_counter += 1
-
-        pageHolder.update({pagehold: microsoft_label})
-        nameHolder.append("Microsoft")
+            pageHolder.update({pagehold: microsoft_label})
+            nameHolder.append("Microsoft Keyboard. Enabled: " + str(microsoft_enable_check))
+        except FileNotFoundError:
+            print('Skipping Microsoft Keyboard Manager since it is not in use.')
 
         # only show first "page" on start
-        if pageHolder is not None:
-            pageSelectBox = QtWidgets.QComboBox(self)
-            pageSelectBox.resize(200,25)
-            pageSelectBox.move(int(maxWidthReached - (pageSelectBox.width() / 2)), int((maxHeightReached + 100) - 50))
-            pageSelectBox.activated.connect(self.changePage)
+        try:
+            if pageHolder is not None:
+                pageSelectBox = QtWidgets.QComboBox(self)
+                pageSelectBox.resize(200,25)
+                pageSelectBox.move(int(maxWidthReached - (pageSelectBox.width() / 2)), int((maxHeightReached + 100) - 50))
+                pageSelectBox.activated.connect(self.changePage)
 
-        for key, page in pageHolder.items():
-            pageSelectBox.addItem(nameHolder[key])
-            for button in page:
-                if key == 0:
-                    button.show()
-                else:
-                    button.hide()
+            for key, page in pageHolder.items():
+                pageSelectBox.addItem(nameHolder[key])
+                for button in page:
+                    if key == 0:
+                        button.show()
+                    else:
+                        button.hide()
+        finally:
+            pass
 
         self.setFixedSize(maxWidthReached * 2, maxHeightReached + 100)  # Is this the best way?
 
