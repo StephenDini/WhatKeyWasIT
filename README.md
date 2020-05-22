@@ -1,5 +1,5 @@
 # WhatKeyWasIt
-This program will display keybindings for Corsair products as a quick, always on top, pop up. More program compatability in progress. 
+This program will display keybindings for Corsair products and Microsoft PowetToys Keyboard Manager as a quick, always on top, pop up. More program compatability in progress. 
 
 # Depends on
 PyQt5 and pyqtkeybind
@@ -21,6 +21,8 @@ This program works better if you name your profile bindings in iCUE.
 
 The order the keybindings are shown is determined by the order in iCUE
 
+Microsoft Keyboard Manager will be the last page and will show if it is enabled or not(currently needs a restart to update)
+
 # Gif
 ![Example Gif](/Example.gif)
 
@@ -28,6 +30,7 @@ The order the keybindings are shown is determined by the order in iCUE
   * Code Clean up
   * Razer Compatability
   * Logitech Compatability
+  * Microsoft Keyboard Manager : Finished
   * Packaged Program
   * Overall Look and Design Improvements
   * Save and Loading
