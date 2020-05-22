@@ -13,6 +13,8 @@ from PyQt5.QtWidgets import QMainWindow, QPushButton, QSizePolicy
 from pyqtkeybind import keybinder
 from os import system
 
+import MicrosoftScrape
+
 latch = False
 system("title " + "PopUp")
 profilePathList = list
@@ -79,7 +81,9 @@ class ImportProfile(profilePathList):
                         if keyBound.find('first') is not None:
                             if strokeContainer is None:
                                 strokeContainer = keyBound.find('first').text
+                                print(strokeContainer)
                                 strokeContainer = strokeContainer + ', ' + keyBound.find('second').text
+                                print(strokeContainer)
                             else:
                                 strokeContainer = strokeContainer + ', ' + keyBound.find('first').text
                                 strokeContainer = strokeContainer + ', ' + keyBound.find('second').text
@@ -118,7 +122,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(
             QtWidgets.QStyle.alignedRect(
                 QtCore.Qt.LeftToRight, QtCore.Qt.AlignCenter,
-                QtCore.QSize(400, 400),
+                QtCore.QSize(750, 500),
                 QtWidgets.qApp.desktop().availableGeometry()
             ))
 
@@ -185,6 +189,36 @@ class MainWindow(QMainWindow):
             pageHolder.update({pagehold: buttonList.copy()})
             pagehold += 1
             buttonList.clear()
+
+        x = 20
+        y = 20
+        m_section = 0
+        m_counter = 0
+        microsoft_keybindings = MicrosoftScrape.getListofChanges()
+        microsoft_label = [QPushButton(bind[0], self) for bind in microsoft_keybindings]
+        microsoft_tooltip = [bind[1] for bind in microsoft_keybindings]
+
+        for label in microsoft_label:
+            if m_section == 9:
+                x = x + 175
+                y = 20
+                if maxWidthReached < x:
+                    maxWidthReached = x
+                m_section = 0
+            if m_section == 0:
+                label.move(x, y)
+                label.resize(150, 30)
+                label.setToolTip(microsoft_tooltip[m_counter])
+            else:
+                y = y + 35
+                label.move(x, y)
+                label.resize(150, 30)
+                label.setToolTip(microsoft_tooltip[m_counter])
+            m_section += 1
+            m_counter += 1
+
+        pageHolder.update({pagehold: microsoft_label})
+        nameHolder.append("Microsoft")
 
         # only show first "page" on start
         if pageHolder is not None:
