@@ -1,5 +1,5 @@
 # WhatKeyWasIt
-This program will display keybindings for Corsair products and Microsoft PowetToys Keyboard Manager as a quick, always on top, pop up. More program compatability in progress. 
+This program will display keybindings for Corsair products and Microsoft PowerToys Keyboard Manager as a quick, always on top, pop up. More program compatibility in progress. 
 
 # Depends on
 PyQt5 and pyqtkeybind
@@ -28,8 +28,8 @@ Microsoft Keyboard Manager will be the last page and will show if it is enabled 
 
 ## TODO
   * Code Clean up
-  * Razer Compatability
-  * Logitech Compatability
+  * Razer Compatibility
+  * Logitech Compatibility
   * Microsoft Keyboard Manager : Finished
   * Packaged Program
   * Overall Look and Design Improvements
