@@ -1,5 +1,29 @@
-# Root location to look for.
+import os, re
+from os import path
+
+
+# Root location to look for. RAZER CENTRAL ONLY
 # C:\ProgramData\Razer\Razer Central\Accounts\RZR_0070242a49548f0ad2244e5d505b\Emily3\Devices
+def profiles_found():
+    razer_profiles = list()
+
+    if(str(path.exists("C:\ProgramData\Razer\Razer Central\Accounts")) == 'True' ):
+        for root, dirs, files in os.walk("C:\ProgramData\Razer\Razer Central\Accounts"):
+            for name in dirs:
+                if name[:3] == "RZR":
+                    user_folder = root + '\\' + name
+                    print(user_folder)
+
+        for root, dirs, files in os.walk(user_folder):
+            for name in dirs:
+                if bool(re.match('^\d+(\d{1,3})?$', name)):  # Razer Tartarus Pro
+                    device_folder = root + '\\' + name
+                    root_profile_folder = device_folder + "\\Features"
+                    print(root_profile_folder)
+                    device_name = "Razer Tartarus Pro"
+
+
+        # return 'test'
 
 # Device info location
 # You might be able to ignore 770 folder. This seems to be the chroma connect device.
@@ -28,5 +52,5 @@
 # ./KeyGroup/KeyAssignment/AnalogInput
 
 # TODO: Find the rest starting at Mapping/Joystick
-
+print(profiles_found())
 
