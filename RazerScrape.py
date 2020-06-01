@@ -2,10 +2,22 @@ import os, re
 from os import path
 
 
+def hardware_device(args):
+    """ Argument will be the folder name containing the profiles per device. """
+    switcher = {
+        80:  "Razer Naga Hex",
+        103: "Razer Trinity Naga",
+        580: "Razer Tartarus Pro",
+        770: "Chroma Connect",
+    }
+    return switcher.get(args, "Empty")
+
+
 # Root location to look for. RAZER CENTRAL ONLY
 # C:\ProgramData\Razer\Razer Central\Accounts\RZR_0070242a49548f0ad2244e5d505b\Emily3\Devices
 def profiles_found():
     razer_profiles = list()
+    return_list = list()
 
     if(str(path.exists("C:\ProgramData\Razer\Razer Central\Accounts")) == 'True' ):
         for root, dirs, files in os.walk("C:\ProgramData\Razer\Razer Central\Accounts"):
@@ -17,11 +29,23 @@ def profiles_found():
         for root, dirs, files in os.walk(user_folder):
             for name in dirs:
                 if bool(re.match('^\d+(\d{1,3})?$', name)):  # Razer Tartarus Pro
+                    # [0] Name, [1] Path
                     device_folder = root + '\\' + name
                     root_profile_folder = device_folder + "\\Features"
-                    print(root_profile_folder)
-                    device_name = "Razer Tartarus Pro"
+                    # print(root_profile_folder)
+                    device_name = hardware_device(int(name))
+                    razer_profiles.append((device_name, root_profile_folder))
 
+        print(razer_profiles)
+
+        for name, profile_path in razer_profiles:
+            print(name + ' ' + profile_path)
+            for root, dirs, files in os.walk(profile_path):
+                for file in files:
+                    print(file)
+                    if os.stat(root + '\\' + file).st_size > 10000:
+                        print(os.stat(root + '\\' + file).st_size)
+                        print("worked")  # TODO figure out how to store the keybindings list should I find it here?
 
         # return 'test'
 
@@ -52,5 +76,6 @@ def profiles_found():
 # ./KeyGroup/KeyAssignment/AnalogInput
 
 # TODO: Find the rest starting at Mapping/Joystick
-print(profiles_found())
 
+
+profiles_found()

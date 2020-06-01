@@ -152,6 +152,9 @@ class MainWindow(QMainWindow):
                 y = 20
                 profileName = page.pop(-1)
                 nameHolder.append(profileName.text)
+                M4_triggered_once = False
+                M5_triggered_once = False
+                tcounter = 0
 
                 for part in page:
 
@@ -183,17 +186,32 @@ class MainWindow(QMainWindow):
 
                             labelNew.move(x, y)
 
-                        shortcutCounter += 1
-                        # labelNew.hide()
-                        buttonList.append(labelNew)
-                        section = 1
+                        # This is ugly but it works, TODO: come back to it, I dont want to do this for every weird thing
+                        if labelNew.text()[:6] == "Mouse4" and M4_triggered_once is False:
+                            tcounter += 1
+                            buttonList.append(labelNew)
+                            section = 1
+                            M4_triggered_once = True
+                            shortcutCounter += 1
+                        elif labelNew.text()[:6] == "Mouse5" and M5_triggered_once is False:
+                            buttonList.append(labelNew)
+                            section = 1
+                            M5_triggered_once = True
+                            shortcutCounter += 1
+                        elif labelNew.text()[:6] != "Mouse4" and labelNew.text()[:6] != "Mouse5":
+                            buttonList.append(labelNew)
+                            section = 1
+                            shortcutCounter += 1
+                        else:
+                            if shortcutCounter > 0:
+                                y = y - 35
+                            labelNew.deleteLater()
 
                 pageHolder.update({pagehold: buttonList.copy()})
                 pagehold += 1
                 buttonList.clear()
         except FileNotFoundError:
             print('Skipping corsair since its not in use')
-
 
         try:
             # Bring in Microsoft's Keyboard Manager settings.
