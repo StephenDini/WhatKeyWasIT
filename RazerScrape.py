@@ -1,4 +1,6 @@
 import os, re
+import xml.etree.ElementTree as ET
+import MicrosoftScrape as DV
 from os import path
 
 
@@ -24,7 +26,7 @@ def profiles_found():
             for name in dirs:
                 if name[:3] == "RZR":
                     user_folder = root + '\\' + name
-                    print(user_folder)
+                    # print(user_folder)
 
         for root, dirs, files in os.walk(user_folder):
             for name in dirs:
@@ -36,19 +38,66 @@ def profiles_found():
                     device_name = hardware_device(int(name))
                     razer_profiles.append((device_name, root_profile_folder))
 
-        print(razer_profiles)
+        # print(razer_profiles)
 
         for name, profile_path in razer_profiles:
-            print(name + ' ' + profile_path)
+            # print(name + ' ' + profile_path)
             for root, dirs, files in os.walk(profile_path):
                 for file in files:
-                    print(file)
+                    # print(file)
                     if os.stat(root + '\\' + file).st_size > 10000:
-                        print(os.stat(root + '\\' + file).st_size)
-                        print("worked")  # TODO figure out how to store the keybindings list should I find it here?
+                        # print(os.stat(root + '\\' + file).st_size)
+                        # print(file)
+                        # print("worked")  # TODO figure out how to store the keybindings list should I find it here?
+                        return_list.append(root + '\\' + file)
+                        # print(return_list)
 
-        # return 'test'
+        return return_list
 
+
+def scrape_profiles():
+    list_of_profiles = profiles_found()
+
+    rootContainer = [ET.parse(value).getroot() for value in list_of_profiles]
+    print(rootContainer)
+    # Key connections: key shortcut, key bound, modifier [click, long press]
+    keyCons = list()
+    # Key connection page: each value is a new
+    keyConPage = list()
+
+    # Search through xml for KeyStokes and Save into a list of list
+    # Top list contains each list of keystrokes
+    for root in rootContainer:
+
+        # profileName = root.find('.//name')
+
+        # Find the location of keyStroke's ancestor, We use the ancestor to navigate the keybindings.
+        for parent in root.findall('.//KeyAssignment/../../../../..'):
+
+            # drop into the child of the parent.
+            for child in parent:
+                nameTag = child.find('Name')
+                MappingList = child.find('MappingList')
+                # keyNameChild = child.find('ptr_wrapper/data/keyName')
+                # keyBound = child.find('.//second/..')
+                # strokeContainer = None
+                print('=========================')
+                print(nameTag.text)
+                # print(nameTag.text + "\n" + MappingList.te9xt)
+                print('=========================')
+
+                for Mappings in MappingList.findall('.//KeyGroup/'):
+                    if Mappings.find('VirtualKey') is not None:
+                        scan_code = Mappings.find('Scancode')
+                        virtual_key = Mappings.find('VirtualKey')
+                        actual_key = DV.devirtualize(virtual_key.text)
+                        print('The Scan Code: ' + scan_code.text)
+                        print('The virtual key created: ' + virtual_key.text)
+                        print('The actual key pressed: ' + actual_key)
+
+
+
+scrape_profiles()
 # Device info location
 # You might be able to ignore 770 folder. This seems to be the chroma connect device.
 # /XXX/DeviceInfo.xml > under <Name> DEVICENAME </Name>
@@ -78,4 +127,4 @@ def profiles_found():
 # TODO: Find the rest starting at Mapping/Joystick
 
 
-profiles_found()
+# profiles_found()
