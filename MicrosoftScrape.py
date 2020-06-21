@@ -30,7 +30,7 @@ def getListofChanges():
     inProcess = remapKeys["inProcess"]
     enable_check = m_enabled_check["enabled"]
     key_manager = enable_check["Keyboard Manager"]
-    print(key_manager)
+    # print(key_manager)
 
     gathered_binds = [(str(devirtualize(container['originalKeys'])),  str(devirtualize(container['newRemapKeys']))) for container in inProcess]
     gathered_binds.append(key_manager)

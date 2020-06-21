@@ -14,6 +14,7 @@ from pyqtkeybind import keybinder
 from os import system
 
 import MicrosoftScrape
+import RazerScrape
 
 latch = False
 system("title " + "PopUp")
@@ -139,6 +140,7 @@ class MainWindow(QMainWindow):
         maxHeightReached = 0
         maxWidthReached = 0
 
+        # Bring in iCUE settings.
         try:
             profileList = listifyFolderFiles(os.path.expandvars(r'%APPDATA%\Corsair\CUE\profiles'))
             DATA = ImportProfile()
@@ -246,7 +248,66 @@ class MainWindow(QMainWindow):
                 m_counter += 1
 
             pageHolder.update({pagehold: microsoft_label})
+            pagehold += 1
             nameHolder.append("Microsoft Keyboard. Enabled: " + str(microsoft_enable_check))
+        except FileNotFoundError:
+            print('Skipping Microsoft Keyboard Manager since it is not in use.')
+
+        # Bring in Razer Synapse settings.
+        try:
+            x = 20
+            y = 20
+            m_section = 0
+
+            razer_profiles = RazerScrape.scrape_profiles()
+            razer_button_list = []
+
+            for profile in razer_profiles:
+                x = 20
+                y = 20
+                m_section = 0
+
+                name = profile.pop()
+                # print(name)
+                for bind in profile:
+                    # print(bind)
+                    key_id, shortcut = bind.split(',')
+
+                    if m_section == 9:
+                        x = x + 175
+                        y = 20
+                        if maxWidthReached < x:
+                            maxWidthReached = x
+                        m_section = 0
+
+                    if m_section == 0:
+                        label = QPushButton(key_id, self)
+                        label.move(x, y)
+                        label.resize(150, 30)
+                        label.setToolTip(shortcut)
+                        # label.hide()
+                    else:
+                        y = y + 35
+                        if maxHeightReached < y:
+                            maxHeightReached = y
+                        label = QPushButton(key_id, self)
+                        label.move(x, y)
+                        label.resize(150, 30)
+                        label.setToolTip(shortcut)
+                        # label.hide()
+
+                    m_section += 1
+                    razer_button_list.append(label)
+
+                    pageHolder.update({pagehold: razer_button_list.copy()})
+
+                    # razer_button_list.clear()
+                # print(len(pageHolder[pagehold]))
+                # print(pagehold)
+                pagehold += 1
+                razer_button_list.clear()
+                nameHolder.append(name)
+
         except FileNotFoundError:
             print('Skipping Microsoft Keyboard Manager since it is not in use.')
 

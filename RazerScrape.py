@@ -59,10 +59,10 @@ def scrape_profiles():
     list_of_profiles = profiles_found()
 
     rootContainer = [ET.parse(value).getroot() for value in list_of_profiles]
-    print(rootContainer)
-    # Key connections: key shortcut, key bound, modifier [click, long press]
+    # print(rootContainer)
+    # Key connections: key shortcut, key bound, modifier [click, long press] for a profile
     keyCons = list()
-    # Key connection page: each value is a new
+    # Key connection page: each value is a profile set
     keyConPage = list()
 
     # Search through xml for KeyStokes and Save into a list of list
@@ -81,23 +81,43 @@ def scrape_profiles():
                 # keyNameChild = child.find('ptr_wrapper/data/keyName')
                 # keyBound = child.find('.//second/..')
                 # strokeContainer = None
-                print('=========================')
-                print(nameTag.text)
+                # print('=========================')
+                # print(nameTag.text)
                 # print(nameTag.text + "\n" + MappingList.te9xt)
-                print('=========================')
+                # print('=========================')
 
-                for Mappings in MappingList.findall('.//KeyGroup/'):
-                    if Mappings.find('VirtualKey') is not None:
-                        scan_code = Mappings.find('Scancode')
-                        virtual_key = Mappings.find('VirtualKey')
+                # Saving only the keys number and the keys mapping.
+                for Mappings in MappingList.findall('.//KeyGroup/..'):
+                    if Mappings.find('.//VirtualKey') is not None:
+                        keys_ID = Mappings.find('.//Id')
+                        scan_code = Mappings.find('.//Scancode')
+                        virtual_key = Mappings.find('.//VirtualKey')
                         actual_key = DV.devirtualize(virtual_key.text)
-                        print('The Scan Code: ' + scan_code.text)
-                        print('The virtual key created: ' + virtual_key.text)
-                        print('The actual key pressed: ' + actual_key)
+
+                        if keys_ID is None:
+                            if Mappings.find('.//MappingGroup').text == 'Keyboard':
+                                keys_ID_text = "Nub"
+                        else:
+                            keys_ID_text = keys_ID.text
+
+                        # order Keys ID, Actual Key. Scan_Code and Virtual_Key is not needed by end user
+                        saved_data = keys_ID_text + ', ' + actual_key
+                        keyCons.append(saved_data)
+                        # print('ID is: ' + keys_ID_text)
+                        # print('The Scan Code: ' + scan_code.text)
+                        # print('The virtual key created: ' + virtual_key.text)
+                        # print('The actual key pressed: ' + actual_key)
+                
+                if keyCons:
+                    keyCons.append(nameTag.text)
+                    keyConPage.append(keyCons.copy())
+                    keyCons.clear()
+
+    return keyConPage
 
 
-
-scrape_profiles()
+# for text in scrape_profiles():
+#     print(text)
 # Device info location
 # You might be able to ignore 770 folder. This seems to be the chroma connect device.
 # /XXX/DeviceInfo.xml > under <Name> DEVICENAME </Name>
