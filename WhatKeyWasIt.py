@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
                 nameHolder.append(name)
 
         except FileNotFoundError:
-            print('Skipping Microsoft Keyboard Manager since it is not in use.')
+            print('Skipping Razer Syngergy since it is not in use.')
 
         # only show first "page" on start
         try:
